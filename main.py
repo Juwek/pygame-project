@@ -1,7 +1,7 @@
 import pygame
 from constants import WIDTH, HEIGHT, FPS
 from Scripts.Player import Player
-from Scripts.Button import Button
+from windows import *
 
 
 if __name__ == '__main__':
@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     all_sprites = pygame.sprite.Group()
     player = Player(all_sprites)
-    start_button = Button("pictures/button.png", 100, 40, all_sprites)
+    state = 0
 
     running = True
     while running:
@@ -21,8 +21,9 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
 
-        all_sprites.draw(screen)
-        all_sprites.update(pygame.key.get_pressed())
+        if state == 0:
+            show_start_window(screen, all_sprites)
+
         pygame.display.flip()
         clock.tick(FPS)
 
