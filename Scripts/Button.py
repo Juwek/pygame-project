@@ -10,5 +10,5 @@ class Button(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.x = 0
 
-    def is_clicked(self):
-        pass
+    def is_clicked(self, func):
+        func()
