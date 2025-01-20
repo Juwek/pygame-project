@@ -27,6 +27,7 @@ class Enemy(pygame.sprite.Sprite):
             self.y += self.speed
         if self.rect.y > self.player_rect_y:
             self.y -= self.speed
+        #fveh
 
     def check_colliders(self, player_rect):
         return pygame.rect.colliderect(self.player_rect)
