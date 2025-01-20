@@ -13,7 +13,7 @@ def show_start_window(screen, group):
     global state, game
     clock = pygame.time.Clock()
     play_button = Button("pictures/button1.png", WIDTH / 2 - 250, HEIGHT / 2 - 125,
-                          500, 250, group)
+                         500, 250, group)
 
     running = True
     while running:
@@ -35,7 +35,7 @@ def show_lobby_window(screen, group):
     global state, game
     clock = pygame.time.Clock()
     start_button = Button("pictures/button2.png", WIDTH - 250, HEIGHT - 150,
-                         200, 100, group)
+                          200, 100, group)
 
     running = True
     while running:
