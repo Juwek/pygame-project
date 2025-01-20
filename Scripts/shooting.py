@@ -10,7 +10,6 @@ class Bullet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=start_pos)
         self.speed = speed
 
-        # Расчет вектора движения
         dx = target_pos[0] - start_pos[0]
         dy = target_pos[1] - start_pos[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)
