@@ -14,7 +14,7 @@ class Bullet(pygame.sprite.Sprite):
         dy = target_pos[1] - start_pos[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)
 
-        if distance > 0:  # Avoid division by zero
+        if distance > 0:
             self.dx = dx / distance
             self.dy = dy / distance
         else:
