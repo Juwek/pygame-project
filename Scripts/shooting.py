@@ -1,20 +1,25 @@
 import pygame
 import math
+import os
+import random
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, start_pos, target_pos, speed, color):
+    def __init__(self, start_pos, target_pos, speed, image_path):
         super().__init__()
-        self.image = pygame.Surface((5, 5))
-        self.image.fill(color)
+        self.original_image = pygame.image.load(image_path).convert_alpha()
+        self.image = self.original_image
         self.rect = self.image.get_rect(center=start_pos)
         self.speed = speed
+        self.angle = 0  # Угол поворота
+        self.rotation_speed = 10  # Скорость вращения
 
+        # Расчет вектора движения
         dx = target_pos[0] - start_pos[0]
         dy = target_pos[1] - start_pos[1]
         distance = math.sqrt(dx ** 2 + dy ** 2)
 
-        if distance > 0:
+        if distance > 0:  # Avoid division by zero
             self.dx = dx / distance
             self.dy = dy / distance
         else:
@@ -24,6 +29,11 @@ class Bullet(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.dx * self.speed
         self.rect.y += self.dy * self.speed
+
+        # Вращение изображения
+        self.angle += self.rotation_speed
+        self.image = pygame.transform.rotate(self.original_image, self.angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
 
         # Удалить пулю, когда она уходит за экран
         if (self.rect.x < 0 or self.rect.x > 800 or self.rect.y < 0 or self.rect.y > 600):  # Размеры экрана 800x600
@@ -38,12 +48,33 @@ class Shooter():
         self.image = pygame.Surface((self.size, self.size))
         self.image.fill(self.color)
         self.rect = self.image.get_rect(center=(400, 300))  # Начальное положение шутера
+        self.image_paths = self.create_random_image_list()  # Список путей к изображениям
+        self.current_image_index = 0
+
+    def create_random_image_list(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))  # получение пути скрипта
+        image_files = [f for f in os.listdir(script_dir) if
+                       os.path.isfile(os.path.join(script_dir, f)) and f.endswith(('.png', '.jpg')) and f[
+                                                                                                        :-4].isdigit()]  # фильтр только изображений с именем от 1.png до 10.png
+        if image_files:
+            image_paths = [os.path.join(script_dir, f) for f in image_files]  # полный путь до файлов
+            random.shuffle(image_paths)
+            return image_paths
+        return []  # возвращает пустой список если нет файлов
+
+    def get_next_image_path(self):
+        if self.image_paths:
+            path = self.image_paths[self.current_image_index]
+            self.current_image_index = (self.current_image_index + 1) % len(self.image_paths)  # Зацикливание списка
+            return path
+        return None
 
     def shoot(self, target_pos):
         bullet_speed = 10
-        bullet_color = (255, 0, 0)  # Красные пули
-        bullet = Bullet(self.rect.center, target_pos, bullet_speed, bullet_color)
-        self.bullets.add(bullet)
+        image_path = self.get_next_image_path()
+        if image_path:
+            bullet = Bullet(self.rect.center, target_pos, bullet_speed, image_path)
+            self.bullets.add(bullet)
 
     def update(self):
         self.bullets.update()
