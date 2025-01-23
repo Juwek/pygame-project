@@ -10,7 +10,7 @@ from Scripts.Picture import Picture
 
 state = 0
 game = True
-
+spis = ['crazy', 'devil', 'poker']
 
 def show_start_window(screen, group):
     global state, game
@@ -88,7 +88,7 @@ def show_main_window(screen, group, map):
                 game = False
             elif event.type == enemy_timer:
                 ex, ey = choice(x), choice(y)
-                enemies.append(Enemy("pictures/enemies/poker.png",
+                enemies.append(Enemy(f"pictures/enemies/{spis.choice()}.png",
                                      (ex, ey), group))
             elif event.type == wave_timer:
                 #снижается время спавна врага на 10% и обновляется таймер
