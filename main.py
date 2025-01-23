@@ -99,6 +99,12 @@ def show_main_window(screen, group, map):
         group_map.update()
         for enemy in enemies:
             enemy.draw((player.x, player.y), (player.rect.x, player.rect.y))
+        collisions = pygame.sprite.spritecollide(player, enemies, False)
+            if collisions:
+                player.health -= 10
+                enemy.hit = True
+                    if player.health <= 0:
+                        running = False
         group.draw(screen)
         group.update()
         pygame.display.flip()
