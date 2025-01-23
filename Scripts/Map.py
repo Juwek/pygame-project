@@ -1,15 +1,17 @@
 import pygame
 from extensions import load_image
-from constants import WIDTH, HEIGHT
+from random import choice
 
 
 class Map(pygame.sprite.Sprite):
-    def __init__(self, path, speed, *group):
+    def __init__(self, map, pos: tuple[int, int], speed, *group):
         super().__init__(*group)
-        self.image = load_image(path)
+        self.path = [['maps/1.png', 'maps/2.png', 'maps/3.png', 'maps/4.png', 'maps/5.png', 'maps/6.png'], []]
+        # self.image = load_image(self.path[map][choice(range(0, len(self.path[map]) - 1))])
+        self.image = load_image(self.path[0][0])
         self.rect = self.image.get_rect()
-        self.rect.x = -self.image.get_width() / 2
-        self.rect.y = -self.image.get_height() / 2
+        self.rect.x = pos[0]
+        self.rect.y = pos[1]
         self.speed = speed
 
     def update(self):

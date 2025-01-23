@@ -7,16 +7,20 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = load_image(path)
         self.rect = self.image.get_rect()
+        self.rect.x = start_pos[0]
+        self.rect.y = start_pos[1]
         self.x = start_pos[0]
         self.y = start_pos[1]
-        self.speed = 2
+        self.speed = 1.4
 
     def draw(self, player_pos, player_rect):
-        self.rect.x = self.x - player_pos[0]
-        self.rect.y = self.y - player_pos[1]
+        self.player_x = player_pos[0]
+        self.player_y = player_pos[1]
         self.player_rect_x = player_rect[0]
         self.player_rect_y = player_rect[1]
-        self.player_rect = player_rect
+
+        self.rect.x = self.x - self.player_x
+        self.rect.y = self.y - self.player_y
 
     def update(self):
         if self.rect.x < self.player_rect_x:
@@ -27,7 +31,6 @@ class Enemy(pygame.sprite.Sprite):
             self.y += self.speed
         if self.rect.y > self.player_rect_y:
             self.y -= self.speed
-        #fveh
 
     def check_colliders(self, player_rect):
-        return pygame.rect.colliderect(self.player_rect)
+        return self.rect.colliderect(player_rect)
