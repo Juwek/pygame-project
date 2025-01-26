@@ -7,10 +7,13 @@ from Scripts.Player import Player
 from Scripts.Map import Map
 from Scripts.Enemy import Enemy
 from Scripts.Picture import Picture
+from Scripts.Coin import ParticleCoins
+from extensions import get_data, set_text
 
 state = 0
 game = True
 spis = ['crazy', 'devil', 'poker']
+
 
 def show_start_window(screen, group):
     global state, game
@@ -38,12 +41,17 @@ def show_start_window(screen, group):
 def show_lobby_window(screen, group):
     global state, game
     clock = pygame.time.Clock()
+    data = get_data()
+    coins = data['coins']
     start_button = Button("pictures/buttons/button2.png", WIDTH - 250, HEIGHT - 150,
                           200, 100, group)
+    Picture('pictures/coin.png', (10, 10), (50, 50), group)
+    coins_text = set_text(45, f' x {coins}')
 
     running = True
     while running:
         screen.fill('black')
+        screen.blit(coins_text, (60, 10))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -62,22 +70,34 @@ def show_main_window(screen, group, map):
     global state, game
     clock = pygame.time.Clock()
     group_map = pygame.sprite.Group()
-    world_map = Map(map, (0, 0), 3, group_map)
-    player = Player(world_map.speed, group)
+    group_coins = pygame.sprite.Group()
+    pos = [(0, 0)]
+    tiles_map = []
+    tiles_map.append(Map(map, (0, 0), group_map))
+    player = Player(3, group)
+
+    count_coins = 0
+    coins = []
 
     enemies = []
     limit_spawn = 300
-    #координаты спавна врагов за пределами экрана (не доделано)
-    x = [i for i in range(-limit_spawn, WIDTH + limit_spawn + 1)
-         if (-limit_spawn <= i <= -80) or (WIDTH + 80 <= i <= WIDTH + limit_spawn + 1)]
-    y = [i for i in range(-limit_spawn, HEIGHT + limit_spawn + 1)
-         if (-limit_spawn <= i <= -80) or (HEIGHT + 80 <= i <= HEIGHT + limit_spawn + 1)]
+    #координаты спавна врагов за пределами экрана
+    one = [[x for x in range(-limit_spawn, WIDTH + limit_spawn + 1)
+         if x not in range(-80, WIDTH + 80)],
+           [y for y in range(-limit_spawn, HEIGHT + limit_spawn + 1)]]
+    two = [[x for x in range(-limit_spawn, WIDTH + limit_spawn + 1)],
+           [y for y in range(-limit_spawn, HEIGHT + limit_spawn + 1)
+         if y not in range(-80, HEIGHT + 80)]]
+    enemy_spawn_coords = [one, two]
 
-    enemy_time_spawn = 10                                           #время спавна врага в млсек
+    enemy_time_spawn = 3000                                         #время спавна врага в млсек
     enemy_timer = pygame.USEREVENT + 1
     pygame.time.set_timer(enemy_timer, enemy_time_spawn)            #таймер для спавна врага
     wave_timer = pygame.USEREVENT + 2
-    pygame.time.set_timer(wave_timer, 20000)                  #таймер для снижения времени спавна врага
+    pygame.time.set_timer(wave_timer, 20000)                   #таймер для снижения времени спавна врага
+    stabilization_timer = pygame.USEREVENT + 3
+    stabilization = False
+    Picture('pictures/coin.png', (10, 10), (50, 50), group)
 
     running = True
     while running:
@@ -86,27 +106,55 @@ def show_main_window(screen, group, map):
             if event.type == pygame.QUIT:
                 running = False
                 game = False
-            elif event.type == enemy_timer:
-                ex, ey = choice(x), choice(y)
-                enemies.append(Enemy(f"pictures/enemies/{spis.choice()}.png",
-                                     (ex, ey), group))
-            elif event.type == wave_timer:
+            if event.type == enemy_timer:
+                lst = choice(enemy_spawn_coords)
+                x, y = lst[0], lst[1]
+                enemies.append(Enemy(f"pictures/enemies/{spis[choice(range(0, len(spis)))]}.png",
+                                     (choice(x) + player.x, choice(y) + player.y), group))
+            if event.type == wave_timer:
                 #снижается время спавна врага на 10% и обновляется таймер
                 enemy_time_spawn -= enemy_time_spawn * 10 / 100
                 pygame.time.set_timer(enemy_timer, int(enemy_time_spawn))
+            if event.type == stabilization_timer:
+                stabilization = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                numbers = range(-5, 6)
+                for _ in range(choice(range(1, 4))):
+                    coins.append(ParticleCoins(30, (100, 100), choice(numbers), choice(numbers),
+                                               group_coins))
 
         group_map.draw(screen)
-        group_map.update()
+        for tile in tiles_map:
+            tile.draw((player.x, player.y))
+
+        group_coins.draw(screen)
+        group_coins.update((player.x, player.y))
+        for coin in group_coins:
+            if player.rect.colliderect(coin.rect):
+                group_coins.remove(coin)
+                count_coins += 1
+
         for enemy in enemies:
             enemy.draw((player.x, player.y), (player.rect.x, player.rect.y))
-        collisions = pygame.sprite.spritecollide(player, enemies, False)
-            if collisions:
-                player.health -= 10
-                enemy.hit = True
-                    if player.health <= 0:
-                        running = False
+        enemy_colide = pygame.sprite.spritecollide(player, enemies, False)
+
+        if enemy_colide and not stabilization:
+            player.health -= choice(range(5, 16))
+            pygame.time.set_timer(stabilization_timer, 1000)
+            stabilization = True
+            print(player.health)
+
+        if player.health <= 0:
+            running = False
+            group.empty()
+            state = 1
+
         group.draw(screen)
         group.update()
+
+        coins_text = set_text(45, f' x {count_coins}')
+        screen.blit(coins_text, (60, 10))
+
         pygame.display.flip()
         clock.tick(FPS)
 

@@ -7,10 +7,8 @@ class Enemy(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = load_image(path)
         self.rect = self.image.get_rect()
-        self.rect.x = start_pos[0]
-        self.rect.y = start_pos[1]
-        self.x = start_pos[0]
-        self.y = start_pos[1]
+        self.rect.x, self.rect.y = start_pos
+        self.x, self.y = start_pos
         self.speed = 1.4
 
     def draw(self, player_pos, player_rect):
