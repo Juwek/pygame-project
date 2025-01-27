@@ -10,6 +10,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = start_pos
         self.x, self.y = start_pos
         self.speed = 1.4
+        self.health = 50
 
     def draw(self, player_pos, player_rect):
         self.player_x = player_pos[0]
