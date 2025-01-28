@@ -19,10 +19,5 @@ def set_text(size, text):
     return font.render(text, True, (255, 255, 255))
 
 
-def get_data():
-    with open('data.txt', 'r') as file:
-        data = {}
-        for line in file.readlines():
-            inf = line.split()
-            data[inf[0]] = inf[1]
-    return data
+def base_is_created():
+    return os.path.isfile('data.sqlite')

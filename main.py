@@ -8,7 +8,8 @@ from Scripts.Map import Map
 from Scripts.Enemy import Enemy
 from Scripts.Picture import Picture
 from Scripts.Coin import ParticleCoins
-from extensions import get_data, set_text
+from Scripts.Base import *
+from extensions import set_text, base_is_created
 
 state = 0
 game = True
@@ -41,8 +42,7 @@ def show_start_window(screen, group):
 def show_lobby_window(screen, group):
     global state, game
     clock = pygame.time.Clock()
-    data = get_data()
-    coins = data['coins']
+    coins = 0
     start_button = Button("pictures/buttons/button2.png", WIDTH - 250, HEIGHT - 150,
                           200, 100, group)
     Picture('pictures/coin.png', (10, 10), (50, 50), group)
@@ -164,6 +164,11 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
+
+    if not base_is_created():
+        create_base()
+    set_data('coins', 34)
+    print(get_data())
 
     """Для каждого окна создается отдельная группа спрайтов"""
     start_group = pygame.sprite.Group()
