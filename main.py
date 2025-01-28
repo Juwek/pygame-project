@@ -167,8 +167,6 @@ if __name__ == '__main__':
 
     if not base_is_created():
         create_base()
-    set_data('coins', 34)
-    print(get_data())
 
     """Для каждого окна создается отдельная группа спрайтов"""
     start_group = pygame.sprite.Group()
