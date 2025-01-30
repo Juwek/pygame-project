@@ -14,6 +14,7 @@ from extensions import set_text, base_is_created
 state = 0
 game = True
 spis = ['crazy', 'devil', 'poker']
+main_count_coin = 0
 
 
 def show_start_window(screen, group):
@@ -40,13 +41,15 @@ def show_start_window(screen, group):
 
 
 def show_lobby_window(screen, group):
-    global state, game
+    global state, game, main_count_coin
     clock = pygame.time.Clock()
-    coins = 0
+    data = get_data()
+    print(data)
+    main_count_coin = data['coins']
     start_button = Button("pictures/buttons/button2.png", WIDTH - 250, HEIGHT - 150,
                           200, 100, group)
     Picture('pictures/coin.png', (10, 10), (50, 50), group)
-    coins_text = set_text(45, f' x {coins}')
+    coins_text = set_text(45, f' x {main_count_coin}')
 
     running = True
     while running:
@@ -68,6 +71,7 @@ def show_lobby_window(screen, group):
 """главный цикл самой игры"""
 def show_main_window(screen, group, map):
     global state, game
+    print(main_count_coin)
     clock = pygame.time.Clock()
     group_map = pygame.sprite.Group()
     group_coins = pygame.sprite.Group()
@@ -76,7 +80,7 @@ def show_main_window(screen, group, map):
     tiles_map.append(Map(map, (0, 0), group_map))
     player = Player(3, group)
 
-    count_coins = 0
+    count_coin = 0
     coins = []
 
     enemies = []
@@ -132,7 +136,7 @@ def show_main_window(screen, group, map):
         for coin in group_coins:
             if player.rect.colliderect(coin.rect):
                 group_coins.remove(coin)
-                count_coins += 1
+                count_coin += 1
 
         for enemy in enemies:
             enemy.draw((player.x, player.y), (player.rect.x, player.rect.y))
@@ -142,9 +146,9 @@ def show_main_window(screen, group, map):
             player.health -= choice(range(5, 16))
             pygame.time.set_timer(stabilization_timer, 1000)
             stabilization = True
-            print(player.health)
 
         if player.health <= 0:
+            set_data('coins', main_count_coin + count_coin)
             running = False
             group.empty()
             state = 1
@@ -152,7 +156,7 @@ def show_main_window(screen, group, map):
         group.draw(screen)
         group.update()
 
-        coins_text = set_text(45, f' x {count_coins}')
+        coins_text = set_text(45, f' x {count_coin}')
         screen.blit(coins_text, (60, 10))
 
         pygame.display.flip()

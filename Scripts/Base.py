@@ -1,7 +1,9 @@
 import sqlite3
 from constants import BASE
 
-values = ['coins']
+data_dict = {
+    'coins': None
+}
 
 
 def create_base():
@@ -27,14 +29,17 @@ def get_data():
     data = cur.execute('''
     SELECT * FROM Data
     ''').fetchall()
+    for i in enumerate(data_dict):
+        data_dict[i[1]] = data[0][i[0] + 1]
     base.close()
-    return data
+    return data_dict
 
 
 def set_data(arg, value):
     base = sqlite3.connect(BASE)
     cur = base.cursor()
-    cur.execute('''
-    UPDATE Data SET ? = ?
-    ''', (str(arg), str(value)))
+    cur.execute(f'''
+    UPDATE Data SET {arg} = ?
+    ''', (str(value),))
+    base.commit()
     base.close()
