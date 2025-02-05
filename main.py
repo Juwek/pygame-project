@@ -15,14 +15,15 @@ state = 0
 game = True
 spis = ['crazy', 'devil', 'poker']
 main_count_coin = 0
+collected_coins = 0
 
 
 def show_start_window(screen, group):
     global state, game
     clock = pygame.time.Clock()
     Picture("maps/1.png", (0, 0), (1000, 800), group)
-    play_button = Button("pictures/buttons/button1.png", WIDTH / 2 - 250, HEIGHT / 2 - 125,
-                         500, 250, group)
+    play_button = Button("pictures/buttons/button1.png", WIDTH / 2 - 300, HEIGHT / 2 - 100,
+                         600, 200, group)
 
     running = True
     while running:
@@ -44,7 +45,6 @@ def show_lobby_window(screen, group):
     global state, game, main_count_coin
     clock = pygame.time.Clock()
     data = get_data()
-    print(data)
     main_count_coin = data['coins']
     start_button = Button("pictures/buttons/button2.png", WIDTH - 250, HEIGHT - 150,
                           200, 100, group)
@@ -53,7 +53,7 @@ def show_lobby_window(screen, group):
 
     running = True
     while running:
-        screen.fill('black')
+        screen.fill('#131010')
         screen.blit(coins_text, (60, 10))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -70,7 +70,7 @@ def show_lobby_window(screen, group):
 
 """главный цикл самой игры"""
 def show_main_window(screen, group, map):
-    global state, game
+    global state, game, collected_coins
     print(main_count_coin)
     clock = pygame.time.Clock()
     group_map = pygame.sprite.Group()
@@ -148,10 +148,11 @@ def show_main_window(screen, group, map):
             stabilization = True
 
         if player.health <= 0:
+            collected_coins = count_coin
             set_data('coins', main_count_coin + count_coin)
             running = False
             group.empty()
-            state = 1
+            state = 3
 
         group.draw(screen)
         group.update()
@@ -159,6 +160,33 @@ def show_main_window(screen, group, map):
         coins_text = set_text(45, f' x {count_coin}')
         screen.blit(coins_text, (60, 10))
 
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def show_final_window(screen, group, coins):
+    global state, game
+    clock = pygame.time.Clock()
+    Picture("pictures/rip.png", (WIDTH / 2 - 70, 140), (140, 140), group)
+    final_text = set_text(45, 'You lose')
+    statistic = set_text(45, f'coins: {coins}')
+    lobby_button = Button('pictures/buttons/button3.png', WIDTH / 2 - 175, 600,
+                          350, 150, group)
+
+    running = True
+    while running:
+        screen.fill('#131010')
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+                game = False
+            if lobby_button.is_clicked(event):
+                state = 1
+                running = False
+
+        group.draw(screen)
+        screen.blit(final_text, (WIDTH / 2 - final_text.get_width() / 2, 60))
+        screen.blit(statistic, (WIDTH / 2 - statistic.get_width() / 2, 350))
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -176,6 +204,7 @@ if __name__ == '__main__':
     start_group = pygame.sprite.Group()
     lobby_group = pygame.sprite.Group()
     main_group = pygame.sprite.Group()
+    final_group = pygame.sprite.Group()
 
     while game:
         screen.fill('black')
@@ -189,6 +218,8 @@ if __name__ == '__main__':
             show_lobby_window(screen, lobby_group)
         elif state == 2:
             show_main_window(screen, main_group, 0)
+        elif state == 3:
+            show_final_window(screen, final_group, collected_coins)
 
         pygame.display.flip()
         clock.tick(FPS)
