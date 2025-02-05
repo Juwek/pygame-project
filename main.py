@@ -77,7 +77,7 @@ def show_main_window(screen, group, map):
     group_coins = pygame.sprite.Group()
     pos = [(0, 0)]
     tiles_map = []
-    tiles_map.append(Map(map, (0, 0), group_map))
+    tiles_map.append(Map(map, group_map))
     player = Player(3, group)
 
     count_coin = 0
