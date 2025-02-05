@@ -105,6 +105,10 @@ def show_main_window(screen, group, map):
 
     running = True
     while running:
+        health_bar_width = int(player.health / player.max_health * 200)
+        health_bar_rect = pygame.Rect(10, 10, health_bar_width, 20)
+        pygame.draw.rect(screen, (0, 255, 0), health_bar_rect)
+        pygame.draw.rect(screen, (255, 0, 0), (10, 10, 200, 20), 2)
         screen.fill('black')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
