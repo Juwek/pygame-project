@@ -14,6 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.x = 0
         self.y = 0
         self.health = 100
+        self.health = self.max_health
         #fer
 
     def update(self):
