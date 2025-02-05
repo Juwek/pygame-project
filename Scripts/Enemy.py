@@ -22,14 +22,20 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y = self.y - self.player_y
 
     def update(self):
-        if self.rect.x < self.player_rect_x:
-            self.x += self.speed
-        if self.rect.x > self.player_rect_x:
-            self.x -= self.speed
-        if self.rect.y < self.player_rect_y:
-            self.y += self.speed
-        if self.rect.y > self.player_rect_y:
-            self.y -= self.speed
+        dx = 0
+        dy = 0
+        if self.rect.centerx < player.rect.centerx:
+            dx = self.speed
+        elif self.rect.centerx > player.rect.centerx:
+            dx = -self.speed
+
+        if self.rect.centery < player.rect.centery:
+            dy = self.speed
+        elif self.rect.centery > player.rect.centery:
+            dy = -self.speed
+
+        self.rect.x += dx
+        self.rect.y += dy
 
     def check_colliders(self, player_rect):
         return self.rect.colliderect(player_rect)
