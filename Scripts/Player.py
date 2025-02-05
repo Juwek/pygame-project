@@ -14,7 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.max_health = 100 
         self.health = self.max_health
 
-    def update(self):
+    def update(self, *args):
         keys = pygame.key.get_pressed()
         dx = 0
         dy = 0
@@ -26,5 +26,6 @@ class Player(pygame.sprite.Sprite):
             dy -= self.speed
         if keys[pygame.K_s]:
             dy += self.speed
+
         self.rect.x += dx
         self.rect.y += dy
