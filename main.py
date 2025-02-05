@@ -133,7 +133,7 @@ def show_main_window(screen, group, map):
 
         group_map.draw(screen)
         for tile in tiles_map:
-            tile.draw((player.x, player.y))
+            tile.draw(player.rect)
 
         group_coins.draw(screen)
         group_coins.update((player.x, player.y))
