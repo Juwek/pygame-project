@@ -143,8 +143,9 @@ def show_main_window(screen, group, map):
                 count_coin += 1
 
         for enemy in enemies:
-            enemy.draw((player.x, player.y), (player.rect.x, player.rect.y))
-        enemy_colide = pygame.sprite.spritecollide(player, enemies, False)
+            enemy.update()
+            if pygame.sprite.collide_rect(player, enemy):
+                player.health -= 10
 
         if enemy_colide and not stabilization:
             player.health -= choice(range(5, 16))
