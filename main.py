@@ -205,30 +205,57 @@ def show_main_window(screen, group, map):
 
 
 def show_final_window(screen, group, coins):
-    global state, game
-    clock = pygame.time.Clock()
-    Picture("pictures/rip.png", (WIDTH / 2 - 70, 140), (140, 140), group)
-    final_text = set_text(45, 'You lose')
-    statistic = set_text(45, f'coins: {coins}')
+    """
+    Отображает финальное окно игры, показывающее сообщение о проигрыше и статистику (количество монет).
+    Также включает кнопку для возврата в лобби.
+
+    Args:
+        screen: Объект поверхности Pygame, на котором отображается окно.
+        group: Объект группы спрайтов Pygame, в которой хранятся элементы окна.
+        coins:  Количество монет, заработанных игроком.
+
+    Изменяет глобальные переменные:
+        state:  Изменяется на 1, если нажата кнопка "Лобби" (возврат в лобби).
+        game: Изменяется на False, если игрок закрывает окно.
+    """
+    global state, game  # Объявляем, что используем глобальные переменные state и game.
+    clock = pygame.time.Clock()  # Создаем объект Clock для контроля FPS.
+
+    # Создаем и добавляем изображение "RIP" (Rest In Peace) в группу спрайтов.
+    Picture("pictures/rip.png", (WIDTH / 2 - 70, 140), (140, 140), group)  # Отображаем изображение "RIP"
+
+    # Создаем текст с сообщением о проигрыше.
+    final_text = set_text(45, 'You lose')  # Создаем текст "You lose".
+
+    # Создаем текст со статистикой (количество монет).
+    statistic = set_text(45, f'coins: {coins}')  # Создаем текст со статистикой.
+
+    # Создаем и добавляем кнопку "Лобби" в группу спрайтов.
     lobby_button = Button('pictures/buttons/button3.png', WIDTH / 2 - 175, 600,
-                          350, 150, group)
+                          350, 150, group)  # Создаем кнопку "Лобби".
 
-    running = True
-    while running:
-        screen.fill('#131010')
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                game = False
-            if lobby_button.is_clicked(event):
-                state = 1
-                running = False
+    running = True  # Устанавливаем флаг для управления игровым циклом.
+    while running:  # Основной игровой цикл для финального окна.
+        screen.fill('#131010')  # Заполняем экран темно-серым цветом.
 
-        group.draw(screen)
+        for event in pygame.event.get():  # Обрабатываем события.
+            if event.type == pygame.QUIT:  # Если игрок закрыл окно.
+                running = False  # Останавливаем игровой цикл.
+                game = False  # Завершаем игру.
+            if lobby_button.is_clicked(event):  # Если кнопка "Лобби" нажата.
+                state = 1  # Переключаемся в состояние лобби.
+                running = False  # Останавливаем игровой цикл финального окна.
+
+        group.draw(screen)  # Отображаем все спрайты из группы на экране.
+
+        # Отображаем текст "You lose" по центру экрана.
         screen.blit(final_text, (WIDTH / 2 - final_text.get_width() / 2, 60))
+
+        # Отображаем статистику (количество монет) по центру экрана.
         screen.blit(statistic, (WIDTH / 2 - statistic.get_width() / 2, 350))
-        pygame.display.flip()
-        clock.tick(FPS)
+
+        pygame.display.flip()  # Обновляем содержимое всего экрана.
+        clock.tick(FPS)  # Контролируем FPS.
 
 
 if __name__ == '__main__':
