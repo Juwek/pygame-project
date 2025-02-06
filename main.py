@@ -19,53 +19,88 @@ collected_coins = 0
 
 
 def show_start_window(screen, group):
-    global state, game
-    clock = pygame.time.Clock()
-    Picture("maps/1.png", (0, 0), (1000, 800), group)
+    """
+    Отображает стартовое окно игры с кнопкой "Играть".
+
+    Args:
+        screen: Объект поверхности Pygame, на котором отображается окно.
+        group: Объект группы спрайтов Pygame, в которой хранятся элементы окна.
+
+    Изменяет глобальные переменные:
+        state:  Изменяется на 1, если нажата кнопка "Играть" (переход к следующему состоянию игры).
+        game: Изменяется на False, если игрок закрывает окно.
+    """
+    global state, game  # Объявляем, что используем глобальные переменные state и game
+    clock = pygame.time.Clock()  # Создаем объект Clock для контроля FPS.
+
+    # Создаем и добавляем фоновое изображение в группу спрайтов.
+    Picture("maps/1.png", (0, 0), (1000, 800), group)  # Отображаем фоновое изображение
+
+    # Создаем и добавляем кнопку "Играть" в группу спрайтов.
     play_button = Button("pictures/buttons/button1.png", WIDTH / 2 - 300, HEIGHT / 2 - 100,
-                         600, 200, group)
+                         600, 200, group) # Создаем кнопку "Играть"
 
-    running = True
-    while running:
-        screen.fill('black')
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                game = False
-            if play_button.is_clicked(event):
-                state = 1
-                running = False
+    running = True  # Устанавливаем флаг для управления игровым циклом.
+    while running:  # Основной игровой цикл для стартового окна.
+        screen.fill('black')  # Заполняем экран черным цветом.
 
-        group.draw(screen)
-        pygame.display.flip()
-        clock.tick(FPS)
+        for event in pygame.event.get():  # Обрабатываем события.
+            if event.type == pygame.QUIT:  # Если игрок закрыл окно.
+                running = False  # Останавливаем игровой цикл.
+                game = False  # Завершаем игру.
+            if play_button.is_clicked(event):  # Если кнопка "Играть" нажата.
+                state = 1  # Переключаемся в следующее состояние игры (например, лобби).
+                running = False  # Останавливаем игровой цикл стартового окна.
+
+        group.draw(screen)  # Отображаем все спрайты из группы на экране.
+        pygame.display.flip()  # Обновляем содержимое всего экрана.
+        clock.tick(FPS)  # Контролируем FPS.
 
 
 def show_lobby_window(screen, group):
-    global state, game, main_count_coin
-    clock = pygame.time.Clock()
-    data = get_data()
-    main_count_coin = data['coins']
+    """
+    Отображает окно лобби игры с кнопкой "Старт" и отображением количества монет игрока.
+
+    Args:
+        screen: Объект поверхности Pygame, на котором отображается окно.
+        group: Объект группы спрайтов Pygame, в которой хранятся элементы окна.
+
+    Изменяет глобальные переменные:
+        state:  Изменяется на 2, если нажата кнопка "Старт" (переход к игровому процессу).
+        game: Изменяется на False, если игрок закрывает окно.
+        main_count_coin: Обновляет количество монет, полученное из `get_data()`.
+    """
+    global state, game, main_count_coin  # Объявляем, что используем глобальные переменные state, game и main_count_coin
+    clock = pygame.time.Clock()  # Создаем объект Clock для контроля FPS.
+
+    data = get_data() # Получаем данные об игре (включая количество монет)
+    main_count_coin = data['coins']  # Обновляем глобальную переменную main_count_coin
+
+    # Создаем и добавляем кнопку "Старт" в группу спрайтов.
     start_button = Button("pictures/buttons/button2.png", WIDTH - 250, HEIGHT - 150,
-                          200, 100, group)
-    Picture('pictures/coin.png', (10, 10), (50, 50), group)
-    coins_text = set_text(45, f' x {main_count_coin}')
+                          200, 100, group) # Создаем кнопку "Старт"
 
-    running = True
-    while running:
-        screen.fill('#131010')
-        screen.blit(coins_text, (60, 10))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                game = False
-            elif start_button.is_clicked(event):
-                state = 2
-                running = False
+    # Создаем и добавляем изображение монеты в группу спрайтов.
+    Picture('pictures/coin.png', (10, 10), (50, 50), group)  # Отображаем изображение монеты
 
-        group.draw(screen)
-        pygame.display.flip()
-        clock.tick(FPS)
+    coins_text = set_text(45, f' x {main_count_coin}') # Создаем текст с количеством монет игрока
+
+    running = True  # Устанавливаем флаг для управления игровым циклом.
+    while running:  # Основной игровой цикл для окна лобби.
+        screen.fill('#131010')  # Заполняем экран темно-серым цветом.
+        screen.blit(coins_text, (60, 10))  # Отображаем текст с количеством монет.
+
+        for event in pygame.event.get():  # Обрабатываем события.
+            if event.type == pygame.QUIT:  # Если игрок закрыл окно.
+                running = False  # Останавливаем игровой цикл.
+                game = False  # Завершаем игру.
+            elif start_button.is_clicked(event):  # Если кнопка "Старт" нажата.
+                state = 2  # Переключаемся в состояние игры.
+                running = False  # Останавливаем игровой цикл окна лобби.
+
+        group.draw(screen)  # Отображаем все спрайты из группы на экране.
+        pygame.display.flip()  # Обновляем содержимое всего экрана.
+        clock.tick(FPS)  # Контролируем FPS.
 
 
 """главный цикл самой игры"""
