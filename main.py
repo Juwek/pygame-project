@@ -13,7 +13,7 @@ from extensions import set_text, base_is_created
 
 state = 0
 game = True
-spis = ['crazy', 'devil', 'poker']
+enemys = ['crazy', 'devil', 'poker']
 main_count_coin = 0
 collected_coins = 0
 
@@ -152,7 +152,7 @@ def show_main_window(screen, group, map):
             if event.type == enemy_timer:
                 lst = choice(enemy_spawn_coords)
                 x, y = lst[0], lst[1]
-                enemies.append(Enemy(f"pictures/enemies/{spis[choice(range(0, len(spis)))]}.png",
+                enemies.append(Enemy(f"pictures/enemies/{enemys[choice(range(0, len(enemys)))]}.png",
                                      (choice(x) + player.x, choice(y) + player.y), group))
             if event.type == wave_timer:
                 #снижается время спавна врага на 10% и обновляется таймер
