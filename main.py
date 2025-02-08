@@ -79,6 +79,7 @@ def show_main_window(screen, group, map):
     tiles_map = []
     tiles_map.append(Map(map, group_map))
     player = Player(3, group)
+    #fe
 
     count_coin = 0
     coins = []
