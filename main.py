@@ -106,7 +106,6 @@ def show_lobby_window(screen, group):
 """главный цикл самой игры"""
 def show_main_window(screen, group, map):
     global state, game, collected_coins
-    print(main_count_coin)
     clock = pygame.time.Clock()
     group_map = pygame.sprite.Group()
     group_coins = pygame.sprite.Group()
@@ -114,7 +113,6 @@ def show_main_window(screen, group, map):
     tiles_map = []
     tiles_map.append(Map(map, group_map))
     player = Player(3, group)
-    #fe
 
     count_coin = 0
     coins = []
@@ -141,10 +139,6 @@ def show_main_window(screen, group, map):
 
     running = True
     while running:
-        health_bar_width = int(player.health / player.max_health * 200)
-        health_bar_rect = pygame.Rect(10, 10, health_bar_width, 20)
-        pygame.draw.rect(screen, (0, 255, 0), health_bar_rect)
-        pygame.draw.rect(screen, (255, 0, 0), (10, 10, 200, 20), 2)
         screen.fill('black')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -166,10 +160,9 @@ def show_main_window(screen, group, map):
                 for _ in range(choice(range(1, 4))):
                     coins.append(ParticleCoins(30, (100, 100), choice(numbers), choice(numbers),
                                                group_coins))
-
         group_map.draw(screen)
         for tile in tiles_map:
-            tile.draw(player.rect)
+            tile.draw((player.x, player.y))
 
         group_coins.draw(screen)
         group_coins.update((player.x, player.y))
@@ -179,9 +172,8 @@ def show_main_window(screen, group, map):
                 count_coin += 1
 
         for enemy in enemies:
-            enemy.update()
-            if pygame.sprite.collide_rect(player, enemy):
-                player.health -= 10
+            enemy.draw((player.x, player.y), (player.rect.x, player.rect.y))
+        enemy_colide = pygame.sprite.spritecollide(player, enemies, False)
 
         if enemy_colide and not stabilization:
             player.health -= choice(range(5, 16))
@@ -200,6 +192,11 @@ def show_main_window(screen, group, map):
 
         coins_text = set_text(45, f' x {count_coin}')
         screen.blit(coins_text, (60, 10))
+        bar_pos = 600, 40
+        health_bar_width = int(player.health * 3)
+        health_bar_rect = pygame.Rect(bar_pos[0], bar_pos[1], health_bar_width, 20)
+        pygame.draw.rect(screen, (0, 0, 0), (bar_pos[0] - 3, bar_pos[1] - 3, 306, 26))
+        pygame.draw.rect(screen, (255, 0, 0), health_bar_rect)
 
         pygame.display.flip()
         clock.tick(FPS)

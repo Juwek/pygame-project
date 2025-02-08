@@ -10,9 +10,8 @@ class Map(pygame.sprite.Sprite):
         self.x = -self.image.get_width() / 2
         self.y = -self.image.get_height() / 2
 
-    def draw(self, player_rect):
-        for i in range(len(self.map)):
-            for j in range(len(self.map[i])):
-                if self.map[i][j]:
-                    self.tile = load_image(f'maps/{self.map[i][j]}.png')
-                    screen.blit(self.tile, (j * 100, i * 100 - player_rect.y))
+    def draw(self, player_pos):
+        self.player_x = player_pos[0]
+        self.player_y = player_pos[1]
+        self.rect.x = self.x - self.player_x
+        self.rect.y = self.y - self.player_y
