@@ -1,5 +1,5 @@
 from random import choice
-from shooting import SpinningImage, images, BACKGROUND_COLOR
+from shooting import SpinningImage, images
 import pygame
 from constants import WIDTH, HEIGHT, FPS
 from Scripts.Button import Button
@@ -141,16 +141,19 @@ def show_main_window(screen, group, map):
                 group_coins.remove(coin)
                 count_coin += 1
 
-        # Проверка столкновений врагов с предметами (врагами)
         for enemy in enemies[:]:
             for image in images[:]:
                 if enemy.rect.colliderect(image.rect):
+                    collision_x = (enemy.rect.x + image.rect.x) // 2
+                    collision_y = (enemy.rect.y + image.rect.y) // 2
+
                     enemies.remove(enemy)
+                    group.remove(enemy)
                     images.remove(image)
-                    # Создаем монеты при уничтожении врага
+
                     numbers = range(-5, 6)
                     for _ in range(choice(range(1, 4))):
-                        coins.append(ParticleCoins(30, (enemy.rect.x, enemy.rect.y), choice(numbers), choice(numbers),
+                        coins.append(ParticleCoins(30, (collision_x, collision_y), choice(numbers), choice(numbers),
                                                    group_coins))
 
         for enemy in enemies:
