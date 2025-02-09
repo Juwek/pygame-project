@@ -7,15 +7,17 @@ from Scripts.Player import Player
 from Scripts.Map import Map
 from Scripts.Enemy import Enemy
 from Scripts.Picture import Picture
+from Scripts.Slider import Slider
 from Scripts.Coin import ParticleCoins
 from Scripts.Base import *
-from extensions import set_text, base_is_created
+from extensions import set_text, base_is_created, load_image
 
 state = 0
 game = True
 enemys = ['crazy', 'devil', 'poker']
 main_count_coin = 0
 collected_coins = 0
+current_map = 0
 
 
 def show_start_window(screen, group):
@@ -70,7 +72,7 @@ def show_lobby_window(screen, group):
         game: Изменяется на False, если игрок закрывает окно.
         main_count_coin: Обновляет количество монет, полученное из `get_data()`.
     """
-    global state, game, main_count_coin  # Объявляем, что используем глобальные переменные state, game и main_count_coin
+    global state, game, main_count_coin, current_map
     clock = pygame.time.Clock()  # Создаем объект Clock для контроля FPS.
 
     data = get_data() # Получаем данные об игре (включая количество монет)
@@ -83,22 +85,41 @@ def show_lobby_window(screen, group):
     # Создаем и добавляем изображение монеты в группу спрайтов.
     Picture('pictures/coin.png', (10, 10), (50, 50), group)  # Отображаем изображение монеты
 
-    coins_text = set_text(45, f' x {main_count_coin}') # Создаем текст с количеством монет игрока
+     # Создаем текст с количеством монет игрока
+    slider = Slider(['maps/preview1.png', 'maps/preview2.png'], data['maps'], group)
 
     running = True  # Устанавливаем флаг для управления игровым циклом.
     while running:  # Основной игровой цикл для окна лобби.
         screen.fill('#131010')  # Заполняем экран темно-серым цветом.
+        coins_text = set_text(45, f' x {main_count_coin}')
         screen.blit(coins_text, (60, 10))  # Отображаем текст с количеством монет.
 
         for event in pygame.event.get():  # Обрабатываем события.
             if event.type == pygame.QUIT:  # Если игрок закрыл окно.
                 running = False  # Останавливаем игровой цикл.
                 game = False  # Завершаем игру.
-            elif start_button.is_clicked(event):  # Если кнопка "Старт" нажата.
+            if start_button.is_clicked(event) and slider.open_maps[slider.current_map]:  # Если кнопка "Старт" нажата.
                 state = 2  # Переключаемся в состояние игры.
-                running = False  # Останавливаем игровой цикл окна лобби.
+                current_map = slider.current_map
+                running = False
+            if slider.right_button.is_clicked(event):
+                slider.current_map = (slider.current_map + 1) % len(slider.maps)
+            if slider.left_button.is_clicked(event):
+                slider.current_map = (slider.current_map - 1) % len(slider.maps)
+            if (slider.buy_button.is_clicked(event) and not slider.open_maps[slider.current_map]
+                and int(slider.buy_button.get_inf()) <= main_count_coin):
+                set_data('coins', main_count_coin - int(slider.buy_button.get_inf()))
+                set_data('maps', '1 1')
+                main_count_coin -= int(slider.buy_button.get_inf())
+                data = get_data()
+                slider.set_open_maps(data['maps'])
+                print(get_data())
 
-        group.draw(screen)  # Отображаем все спрайты из группы на экране.
+        slider.update()
+        #pygame.draw.rect(screen, (0, 0, 0), slider.rect)
+        group.draw(screen)
+        if not slider.open_maps[slider.current_map]:
+            screen.blit(slider.price, (470, 550))
         pygame.display.flip()  # Обновляем содержимое всего экрана.
         clock.tick(FPS)  # Контролируем FPS.
 
@@ -109,9 +130,7 @@ def show_main_window(screen, group, map):
     clock = pygame.time.Clock()
     group_map = pygame.sprite.Group()
     group_coins = pygame.sprite.Group()
-    pos = [(0, 0)]
-    tiles_map = []
-    tiles_map.append(Map(map, group_map))
+    world_map = Map(map, group_map)
     player = Player(3, group)
 
     count_coin = 0
@@ -135,7 +154,6 @@ def show_main_window(screen, group, map):
     pygame.time.set_timer(wave_timer, 20000)                   #таймер для снижения времени спавна врага
     stabilization_timer = pygame.USEREVENT + 3
     stabilization = False
-    Picture('pictures/coin.png', (10, 10), (50, 50), group)
 
     running = True
     while running:
@@ -160,9 +178,9 @@ def show_main_window(screen, group, map):
                 for _ in range(choice(range(1, 4))):
                     coins.append(ParticleCoins(30, (100, 100), choice(numbers), choice(numbers),
                                                group_coins))
+
         group_map.draw(screen)
-        for tile in tiles_map:
-            tile.draw((player.x, player.y))
+        world_map.draw((player.x, player.y))
 
         group_coins.draw(screen)
         group_coins.update((player.x, player.y))
@@ -190,6 +208,7 @@ def show_main_window(screen, group, map):
         group.draw(screen)
         group.update()
 
+        screen.blit(pygame.transform.scale(load_image('pictures/coin.png'), (50, 50)), (10, 10))
         coins_text = set_text(45, f' x {count_coin}')
         screen.blit(coins_text, (60, 10))
         bar_pos = 600, 40
@@ -282,7 +301,7 @@ if __name__ == '__main__':
         elif state == 1:
             show_lobby_window(screen, lobby_group)
         elif state == 2:
-            show_main_window(screen, main_group, 0)
+            show_main_window(screen, main_group, current_map)
         elif state == 3:
             show_final_window(screen, final_group, collected_coins)
 

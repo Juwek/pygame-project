@@ -2,7 +2,8 @@ import sqlite3
 from constants import BASE
 
 data_dict = {
-    'coins': None
+    'coins': None,
+    'maps': None
 }
 
 
@@ -12,12 +13,13 @@ def create_base():
     cur.execute('''
     CREATE TABLE IF NOT EXISTS Data (
     id INTEGER PRIMARY KEY,
-    coins INTEGER
+    coins INTEGER,
+    maps TEXT
     )
     ''')
     base.commit()
     cur.execute('''
-    INSERT INTO Data (coins) VALUES (0)
+    INSERT INTO Data (coins, maps) VALUES (0, "1 0")
     ''')
     base.commit()
     base.close()
