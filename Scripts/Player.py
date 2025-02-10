@@ -1,7 +1,7 @@
 import pygame
 from extensions import load_image
 from constants import WIDTH, HEIGHT
-
+walk_sound = pygame.mixer.Sound('Scripts/sounds/walk.mp3')
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, speed, *group, width=80, height=100):
@@ -18,9 +18,18 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_d]:
             self.x += self.speed
+            self.is_walking = True
         if keys[pygame.K_a]:
             self.x -= self.speed
+            self.is_walking = True
         if keys[pygame.K_w]:
             self.y -= self.speed
+            self.is_walking = True
         if keys[pygame.K_s]:
             self.y += self.speed
+            self.is_walking = True
+
+        if self.is_walking:
+            if not pygame.mixer.get_busy():  # Проверка, не воспроизводится ли уже звук
+                walk_sound.play()
+            self.is_walking = False
