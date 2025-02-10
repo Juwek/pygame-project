@@ -19,6 +19,9 @@ enemys = ['crazy', 'devil', 'poker']
 main_count_coin = 0
 collected_coins = 0
 current_map = 0
+pygame.mixer.init()
+walk_sound = pygame.mixer.Sound('Scripts/sounds/walk.mp3')
+shoot_sound = pygame.mixer.Sound('Scripts/sounds/shoot.mp3')
 
 
 def show_start_window(screen, group):
@@ -181,6 +184,7 @@ def show_main_window(screen, group, map):
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     new_image.set_direction(mouse_x, mouse_y)
                     images.append(new_image)
+                    shoot_sound.play()
 
         group_map.draw(screen)
         world_map.draw((player.x, player.y))
