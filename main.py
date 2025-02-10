@@ -1,6 +1,7 @@
 from random import choice
 
 import pygame
+from Scripts.shooting import SpinningImage
 from constants import WIDTH, HEIGHT, FPS
 from Scripts.Button import Button
 from Scripts.Player import Player
@@ -135,6 +136,7 @@ def show_main_window(screen, group, map):
 
     count_coin = 0
     coins = []
+    images = []
 
     enemies = []
     limit_spawn = 300
@@ -174,10 +176,11 @@ def show_main_window(screen, group, map):
             if event.type == stabilization_timer:
                 stabilization = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                numbers = range(-5, 6)
-                for _ in range(choice(range(1, 4))):
-                    coins.append(ParticleCoins(30, (100, 100), choice(numbers), choice(numbers),
-                                               group_coins))
+                if event.button == 1:
+                    new_image = SpinningImage(WIDTH // 2, HEIGHT // 2)
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    new_image.set_direction(mouse_x, mouse_y)
+                    images.append(new_image)
 
         group_map.draw(screen)
         world_map.draw((player.x, player.y))
@@ -205,6 +208,20 @@ def show_main_window(screen, group, map):
             group.empty()
             state = 3
 
+        # Проверка столкновений врагов с врагами
+        for enemy in enemies:
+            for image in images:
+                if enemy.rect.colliderect(image.rect):
+                    enemies.remove(enemy)
+                    images.remove(image)
+                    group.remove(enemy)
+                    # Создаем монеты при уничтожении врага
+                    numbers = range(-5, 6)
+                    for _ in range(choice(range(1, 4))):
+                        coins.append(
+                            ParticleCoins(30, (enemy.rect.x + player.x, enemy.rect.y + player.y),
+                                          choice(numbers), choice(numbers),group_coins))
+
         group.draw(screen)
         group.update()
 
@@ -216,6 +233,16 @@ def show_main_window(screen, group, map):
         health_bar_rect = pygame.Rect(bar_pos[0], bar_pos[1], health_bar_width, 20)
         pygame.draw.rect(screen, (0, 0, 0), (bar_pos[0] - 3, bar_pos[1] - 3, 306, 26))
         pygame.draw.rect(screen, (255, 0, 0), health_bar_rect)
+
+        images_to_remove = []
+        for image in images:
+            if image.update():
+                images_to_remove.append(image)
+        for image in images_to_remove:
+            images.remove(image)
+
+        for image in images:
+            image.draw(screen)
 
         pygame.display.flip()
         clock.tick(FPS)
